@@ -7,7 +7,7 @@ addpath(genpath('toolboxes'))
 addpath('/home/common/matlab/fieldtrip/qsub')
 masks_location = '/project/3023001.06/Simulations/';
 
-parameters = load_parameters('sjoerd_config_opt_CTX250-011_64.5mm.yaml');
+parameters = load_parameters('sjoerd_config_opt_CTX500-024_203_77.3mm.yaml');
 parameters.results_filename_affix = '_target_left_amygdala';
 parameters.headreco_backup = '/project/3023001.06/Simulations/headreco_backup';
 
@@ -27,9 +27,9 @@ if strcmp(parameters.segmentation_software, 'charm')
 end
 %}
 % Load ROI
-maskname = 'juelich_prob_GM_Amygdala_laterobasal_groupL_thr75_bin.nii.gz';
-mask_location = fullfile(masks_location, maskname);
-mask = niftiread(mask_location);
+mask_name = 'juelich_prob_GM_Amygdala_laterobasal_groupL_thr75_bin.nii.gz';
+mask_path = fullfile(masks_location, mask_name);
+mask = niftiread(mask_path);
 
 create_group_MNI_plots(subject_list, parameters, 'ROI_MNI_mask', mask, 'outputs_suffix', '_max_intensity', 'plot_max_intensity', 1, 'add_FWHM_boundary', 1)
 
@@ -65,8 +65,6 @@ results_mask_overlay = results_mask_overlay(11:(end-10), 11:(end-10), 11:(end-10
 results_mask = results_mask_original.*results_mask_overlay;
 changed_tissue_index = find(results_mask~=results_mask_original);
 segmented_image_mni(changed_tissue_index) = parameters.layer_labels.skin;
-t1_mni_file = '/project/3023001.06/Simulations/final_tissues_MNI';
-niftiwrite(segmented_image_mni, t1_mni_file, 'Compressed', true);
 
 % apply mask on neural tissue
 isppa_map_mni = niftiread(isppa_map_mni_file);
@@ -74,16 +72,5 @@ segmented_image_mni = niftiread(segmented_image_mni_file);
 brain_ind = parameters.layer_labels.brain;
 new_brain_ind = ones(1, length(brain_ind));
 
-results_mask_original = changem(segmented_image_mni, new_brain_ind, brain_ind);
+results_mask_original = changem_vectorized(segmented_image_mni, new_brain_ind, brain_ind);
 results_mask_original(results_mask_original > max(brain_ind)) = 0;
-results_mask_original = logical(results_mask_original);
-results_mask_size = size(results_mask_original);
-
-% Results_mask_overlay is a temporary fix for the neural tissue placed in the skin by Charm
-results_mask_overlay = imresize3(results_mask_original, [(results_mask_size(1) + 20), (results_mask_size(2) + 20), (results_mask_size(3) + 20)]);
-results_mask_overlay = results_mask_overlay(11:(end-10), 11:(end-10), 11:(end-10));
-results_mask = results_mask_original.*results_mask_overlay;
-changed_tissue_index = find(results_mask~=results_mask_original);
-segmented_image_mni(changed_tissue_index) = parameters.layer_labels.skin;
-
-isppa_map_mni = isppa_map_mni.*results_mask;
