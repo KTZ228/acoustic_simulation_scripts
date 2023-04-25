@@ -6,12 +6,12 @@ addpath(genpath('toolboxes'))
 addpath('/home/common/matlab/fieldtrip/qsub')
 masks_location = '/project/3023001.06/Simulations/';
 
-parameters = load_parameters('sjoerd_config_opt_CTX250-001_203_60.9mm.yaml');
+parameters = load_parameters('sjoerd_config_opt_CTX500-024_203_77.3mm.yaml');
 parameters.results_filename_affix = '_target_left_amygdala';
 
 subject_list = [1,3,4,5,8,9,10,14,17,18,19];
 
-maskname = 'juelich_prob_GM_Amygdala_laterobasal_groupL_thr75_bin.nii.gz';
+maskname = 'juelich_prob_GM_Amygdala_laterobasal_groupR_thr75_bin.nii.gz';
 mask_location = fullfile(masks_location, maskname);
 mask = niftiread(mask_location);
 
@@ -20,7 +20,7 @@ options.slice_to_plot = 0;
 options.plot_max_intensity = 1;
 options.slice_label = 'y';
 options.rotation = 90;
-options.plot_heating = 1;
+options.plot_heating = 0;
 options.outputs_suffix = '_max_intensity';
 options.isppa_thresholds = [];
 options.add_FWHM_boundary = 1;
@@ -32,10 +32,10 @@ assert(xor(options.plot_max_intensity,options.slice_to_plot), "You should indica
 slice_labels = {'x','y','z'};
 
 
-outputs_path = parameters.output_dir;
+outputs_path = parameters.temp_output_dir;
 bg_range_to_use = [];
 isppa_range_to_use = [5, 6];
-temp_range_to_use = [37, 37.5];    
+temp_range_to_use = [parameters.thermal.temp_0 parameters.thermal.temp_0 + 0.5];    
 
 full_subject_list = subject_list;
 % first pass: get background intensity at the target slice & isppa range
@@ -211,16 +211,16 @@ for subject_i = 1:length(subject_list)
         
     if isfield(options,'ROI_MNI_mask')
         roi_size = sum(options.ROI_MNI_mask,'all');
-        avg_isppa_within_roi = mean(Isppa_map_mni(options.ROI_MNI_mask),'all');
+        avg_isppa_within_roi = mean(Isppa_map_mni(logical(options.ROI_MNI_mask)),'all');
         n_voxels_within_roi_above_thresh =  sum(options.ROI_MNI_mask & (max_pressure_map_mni >= max_pressure/2),'all');
         curTable.(sprintf('avg_isppa_within_roi%s', options.outputs_suffix)) = avg_isppa_within_roi;
         curTable.(sprintf('perc_voxels_within_roi%s', options.outputs_suffix)) = n_voxels_within_roi_above_thresh/roi_size;
         curTable.(sprintf('perc_voxels_within_fwhm%s', options.outputs_suffix)) = n_voxels_within_roi_above_thresh/fwhm_size;
         curTable.(sprintf('roi_size%s', options.outputs_suffix)) = roi_size;
 
-        writetable(curTable, output_pressure_file);        
+        %writetable(curTable, output_pressure_file); 
     end
- 
+    
     plot_isppa_over_image(Isppa_map_mni, t1_mni, zeros(size(t1_mni)), struct(), {options.slice_label, slice_n}, ...
         uint8.empty([0 3]), uint8.empty([0 3]),...
         [0 0 0 ],'isppa_threshold_low',isppa_threshold_low,'isppa_threshold_high',isppa_threshold_high, 'show_rectangles', 0, 'isppa_color_range', isppa_range_to_use, ...
@@ -259,14 +259,17 @@ for subject_i = 1:length(subject_list)
                 results_prefix, parameters.results_filename_affix, options.outputs_suffix)),'-silent','-r320');
         close
     end
-            
+    
 end
 
 % combine individual images in a single image
-
-suffix_list = {sprintf('maxT_MNI%s%s', parameters.results_filename_affix, options.outputs_suffix),...
-    sprintf('final_isppa_MNI%s%s', parameters.results_filename_affix, options.outputs_suffix)
-    };
+if options.plot_heating
+    suffix_list = {sprintf('maxT_MNI%s%s', parameters.results_filename_affix, options.outputs_suffix),...
+        sprintf('final_isppa_MNI%s%s', parameters.results_filename_affix, options.outputs_suffix)
+        };
+else
+    suffix_list = {sprintf('final_isppa_MNI%s%s', parameters.results_filename_affix, options.outputs_suffix)};
+end
 
 for suffix_cell = suffix_list
     suffix = suffix_cell{:};
