@@ -6,12 +6,12 @@ addpath(genpath('toolboxes'))
 addpath('/home/common/matlab/fieldtrip/qsub')
 masks_location = '/project/3023001.06/Simulations/';
 
-parameters = load_parameters('sjoerd_config_opt_CTX500-024_203_77.3mm.yaml');
-parameters.results_filename_affix = '_target_left_amygdala';
+parameters = load_parameters('sjoerd_config_opt_CTX250-026_105_61.5mm.yaml');
+parameters.results_filename_affix = '_target_right_amygdala';
 
 subject_list = [1,3,4,5,8,9,10,14,17,18,19];
 
-maskname = 'juelich_prob_GM_Amygdala_laterobasal_groupR_thr75_bin.nii.gz';
+maskname = 'juelich_prob_GM_Amygdala_laterobasal_groupR_thr85_bin.nii.gz';
 mask_location = fullfile(masks_location, maskname);
 mask = niftiread(mask_location);
 
@@ -20,8 +20,8 @@ options.slice_to_plot = 0;
 options.plot_max_intensity = 1;
 options.slice_label = 'y';
 options.rotation = 90;
-options.plot_heating = 0;
-options.outputs_suffix = '_max_intensity';
+options.plot_heating = 1;
+options.outputs_suffix = '_85_ROI_mask';
 options.isppa_thresholds = [];
 options.add_FWHM_boundary = 1;
 options.add_ROI_boundary = 1;
@@ -56,7 +56,11 @@ for subject_i = 1:length(full_subject_list)
     max_pressure_mni_file = fullfile(outputs_path, sprintf('%s_final_pressure_MNI%s.nii.gz', results_prefix, parameters.results_filename_affix));
     output_pressure_file = fullfile(outputs_path,sprintf('%s_%s_isppa%s.csv', results_prefix, parameters.simulation_medium, parameters.results_filename_affix));
     
-    t1_mni_file = fullfile(headreco_folder, 'toMNI','final_tissues_MNI.nii.gz');
+    if strcmp(parameters.segmentation_software, 'headreco')
+        t1_mni_file = fullfile(headreco_folder, 'toMNI','T1fs_nu_12DOF_MNI.nii.gz');
+    else
+        t1_mni_file = fullfile(headreco_folder, 'toMNI','final_tissues_MNI.nii.gz');
+    end
     files_to_check = {t1_mni_file , segmented_image_mni_file, isppa_map_mni_file, max_pressure_mni_file, output_pressure_file};
     
     if options.plot_heating
@@ -80,17 +84,24 @@ for subject_i = 1:length(full_subject_list)
     if ~all_files_exist 
         continue;
     end
+
     % get T1 in MNI space
     t1_mni = niftiread(t1_mni_file);
     t1_mni_hdr = niftiinfo(t1_mni_file);
-    
     Isppa_map_mni = niftiread(isppa_map_mni_file);
     segmented_image_mni = niftiread(segmented_image_mni_file);
-    brain_ind = find(strcmp(fieldnames(parameters.layer_labels), 'brain'));
-    segmented_mask = segmented_image_mni~=brain_ind;%(segmented_image_mni ==0 | segmented_image_mni ==4 | segmented_image_mni == 5 | segmented_image_mni == 6);
-    Isppa_map_mni(segmented_mask) = 0; 
     max_pressure_map_mni = niftiread(max_pressure_mni_file);
-    max_pressure_map_mni(segmented_mask) = 0; 
+
+    % Create mask
+    brain_ind = parameters.layer_labels.brain;
+    new_brain_ind = ones(1, length(brain_ind));
+    results_mask_original = changem_vectorized(segmented_image_mni, new_brain_ind, brain_ind);
+    results_mask_original(results_mask_original > max(brain_ind)) = 0;
+    results_mask = logical(results_mask_original);
+
+    % Apply mask
+    Isppa_map_mni = Isppa_map_mni.*results_mask;
+    max_pressure_map_mni = max_pressure_map_mni.*results_mask;
     max_pressure = max(max_pressure_map_mni,[],'all');
 
     if options.slice_to_plot
@@ -130,6 +141,10 @@ for subject_i = 1:length(full_subject_list)
     
     if options.plot_heating
         maxT_mni = niftiread(heating_data_mni_file);
+        water_ind = parameters.layer_labels.water;
+        new_water_ind = zeros(1, length(water_ind));
+        heating_mask = logical(changem_vectorized(segmented_image_mni, new_water_ind, water_ind));
+        maxT_mni = maxT_mni.*heating_mask;
         maxT_mni(maxT_mni==0) = parameters.thermal.temp_0;
 
         maxT_slice = get_slice_by_label(maxT_mni, options.slice_label, slice_n);
@@ -158,20 +173,30 @@ for subject_i = 1:length(subject_list)
     isppa_map_mni_file  = fullfile(outputs_path, sprintf('%s_final_isppa_MNI%s.nii.gz', results_prefix, parameters.results_filename_affix));
     segmented_image_mni_file = fullfile(outputs_path, sprintf('%s_final_medium_masks_MNI%s.nii.gz', results_prefix, parameters.results_filename_affix));
     max_pressure_mni_file = fullfile(outputs_path, sprintf('%s_final_pressure_MNI%s.nii.gz', results_prefix, parameters.results_filename_affix));
-    t1_mni_file = fullfile(headreco_folder, 'toMNI','final_tissues_MNI.nii.gz');
     output_pressure_file = fullfile(outputs_path,sprintf('%s_%s_isppa%s.csv', results_prefix, parameters.simulation_medium, parameters.results_filename_affix));
+    if strcmp(parameters.segmentation_software, 'headreco')
+        t1_mni_file = fullfile(headreco_folder, 'toMNI','T1fs_nu_12DOF_MNI.nii.gz');
+    else
+        t1_mni_file = fullfile(headreco_folder, 'toMNI','final_tissues_MNI.nii.gz');
+    end
 
     % get T1 in MNI space
     t1_mni = niftiread(t1_mni_file);
     t1_mni_hdr = niftiinfo(t1_mni_file);
-    
     Isppa_map_mni = niftiread(isppa_map_mni_file);
     segmented_image_mni = niftiread(segmented_image_mni_file);
-    brain_ind = find(strcmp(fieldnames(parameters.layer_labels), 'brain'));
-    segmented_mask = segmented_image_mni~=brain_ind;
-    Isppa_map_mni(segmented_mask) = 0; 
     max_pressure_map_mni = niftiread(max_pressure_mni_file);
-    max_pressure_map_mni(segmented_mask) = 0; 
+
+    % Create mask
+    brain_ind = parameters.layer_labels.brain;
+    new_brain_ind = ones(1, length(brain_ind));
+    results_mask_original = changem_vectorized(segmented_image_mni, new_brain_ind, brain_ind);
+    results_mask_original(results_mask_original > max(brain_ind)) = 0;
+    results_mask = logical(results_mask_original);
+
+    % Apply mask
+    Isppa_map_mni = Isppa_map_mni.*results_mask;
+    max_pressure_map_mni = max_pressure_map_mni.*results_mask;
     max_pressure = max(max_pressure_map_mni,[],'all');
     
     if isempty(options.isppa_thresholds)
@@ -184,15 +209,19 @@ for subject_i = 1:length(subject_list)
     if options.plot_heating
         heating_data_mni_file = fullfile(outputs_path,sprintf('%s_final_heating_MNI%s.nii.gz', results_prefix, parameters.results_filename_affix));
         maxT_mni = niftiread(heating_data_mni_file);
+        water_ind = parameters.layer_labels.water;
+        new_water_ind = zeros(1, length(water_ind));
+        heating_mask = logical(changem_vectorized(segmented_image_mni, new_water_ind, water_ind));
+        maxT_mni = maxT_mni.*heating_mask;
         maxT_mni(maxT_mni==0) = parameters.thermal.temp_0;
     end
 
+    [~, I] = max(Isppa_map_mni(:));
+    [Px, Py, Pz] = ind2sub(size(Isppa_map_mni), I);
+    max_focus_MNI_grid = [Px, Py, Pz];
     if options.slice_to_plot
         slice_n = options.slice_to_plot;
     else
-        [~, I] = max(Isppa_map_mni(:));
-        [Px, Py, Pz] = ind2sub(size(Isppa_map_mni), I);
-        max_focus_MNI_grid = [Px, Py, Pz];
         slice_n = max_focus_MNI_grid(strcmp(slice_labels,options.slice_label));
     end
 
@@ -203,6 +232,8 @@ for subject_i = 1:length(subject_list)
     end
 
     fwhm_size = sum(max_pressure_map_mni >= max_pressure/2,'all');
+    fwhm_mask = max_pressure_map_mni >= max_pressure/2;
+
     curTable = readtable(output_pressure_file);
     curTable.('fwhm_size_MNI_based_on_pressure') = fwhm_size;
 
@@ -212,7 +243,16 @@ for subject_i = 1:length(subject_list)
     if isfield(options,'ROI_MNI_mask')
         roi_size = sum(options.ROI_MNI_mask,'all');
         avg_isppa_within_roi = mean(Isppa_map_mni(logical(options.ROI_MNI_mask)),'all');
+        if ~isequal((logical(options.ROI_MNI_mask.*fwhm_mask)), zeros(size(options.ROI_MNI_mask)))
+            avg_isppa_within_fwhm_and_roi_overlap = mean(Isppa_map_mni(logical(options.ROI_MNI_mask.*fwhm_mask)),'all');
+        else
+            avg_isppa_within_fwhm_and_roi_overlap = mean(avg_isppa_within_roi, 'all');
+        end
+        curTable.(sprintf('avg_isppa_within_fwhm_and_roi_overlap%s', options.outputs_suffix)) = avg_isppa_within_fwhm_and_roi_overlap;
         n_voxels_within_roi_above_thresh =  sum(options.ROI_MNI_mask & (max_pressure_map_mni >= max_pressure/2),'all');
+        props = regionprops(true(size(options.ROI_MNI_mask)), options.ROI_MNI_mask, 'WeightedCentroid');
+        dist_between_Isppa_and_center_of_ROI = norm(max_focus_MNI_grid - props.WeightedCentroid);
+        curTable.(sprintf('dist_between_Isppa_and_center_of_ROI%s', options.outputs_suffix)) = dist_between_Isppa_and_center_of_ROI;
         curTable.(sprintf('avg_isppa_within_roi%s', options.outputs_suffix)) = avg_isppa_within_roi;
         curTable.(sprintf('perc_voxels_within_roi%s', options.outputs_suffix)) = n_voxels_within_roi_above_thresh/roi_size;
         curTable.(sprintf('perc_voxels_within_fwhm%s', options.outputs_suffix)) = n_voxels_within_roi_above_thresh/fwhm_size;

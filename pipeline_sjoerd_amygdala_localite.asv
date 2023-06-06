@@ -10,6 +10,8 @@ addpath('/home/common/matlab/fieldtrip/qsub')
 run_500KHz = 0;
 timelimit = 60*60*24;
 
+localite_to_MNI_table = ;
+
 % Set config files and export location
 if run_500KHz == 0
     config_left_transducer = 'sjoerd_config_opt_CTX250-001_203_60.9mm.yaml';
@@ -29,6 +31,7 @@ subject_list_table = files(logical(contains(files.name, 'sub') .* ~contains(file
 subject_list = str2double((extract(subject_list_table{:,1}, digitsPattern))');
 
 subject_list = [1,3,4,5,8,9,10,14,17,18,19]; % Temporary, selects subjects with complete files
+%subject_list = [1];
 
 incorrectly_named_transducers = [1, 5, 14];
 
@@ -58,6 +61,15 @@ for subject_id = subject_list
         reference_to_transducer_distance, parameters.expected_focal_distance_mm);
     left_trans_pos = ras_to_grid(left_trans_ras_pos, t1_header);
     left_amygdala_pos = ras_to_grid(left_amygdala_ras_pos, t1_header);
+
+    x_trans_pos_localite = left_trans_ras_pos(1);
+    y_trans_pos_localite = left_trans_ras_pos(2);
+    z_trans_pos_localite = left_trans_ras_pos(3);
+    x_trans_pos_MNI = left_trans_pos(1);
+    y_trans_pos_MNI = left_trans_pos(2);
+    z_trans_pos_MNI = left_trans_pos(3);
+    participant = [subject_id; subject_id];
+    hemisphere = [1; 2];
     
     % Right transducer localite file
     if ismember(subject_id, incorrectly_named_transducers)
@@ -77,6 +89,15 @@ for subject_id = subject_list
         reference_to_transducer_distance, parameters.expected_focal_distance_mm);
     right_trans_pos = ras_to_grid(right_trans_ras_pos, t1_header);
     right_amygdala_pos = ras_to_grid(right_amygdala_ras_pos, t1_header);
+
+    x_trans_pos_localite = [x_trans_pos_localite; right_trans_ras_pos(1)];
+    y_trans_pos_localite = [y_trans_pos_localite; right_trans_ras_pos(2)];
+    z_trans_pos_localite = [z_trans_pos_localite; right_trans_ras_pos(3)];
+    x_trans_pos_MNI = [x_trans_pos_MNI; right_trans_pos(1)];
+    y_trans_pos_MNI = [y_trans_pos_MNI; right_trans_pos(2)];
+    z_trans_pos_MNI = [z_trans_pos_MNI; right_trans_pos(3)];
+
+    localite_to_MNI_table = [localite_to_MNI_table; table(participant,hemisphere,x_trans_pos_localite,y_trans_pos_localite,z_trans_pos_localite,x_trans_pos_MNI,y_trans_pos_MNI,z_trans_pos_MNI)];
 
     % Generate plots with both transducers and targets separately
     imshowpair(plot_t1_with_transducer(t1_image, t1_header.PixelDimensions(1), left_trans_pos, left_amygdala_pos, parameters), plot_t1_with_transducer(t1_image, t1_header.PixelDimensions(1), right_trans_pos, right_amygdala_pos, parameters),'montage');
@@ -100,7 +121,7 @@ for subject_id = subject_list
     parameters.focus_pos_t1_grid = targets(:,target_id)';
     parameters.results_filename_affix = sprintf('_target_%s', target_names{target_id});
     parameters.interactive = 0;
-    single_subject_pipeline_with_qsub(subject_id, parameters, timelimit);
+    %single_subject_pipeline_with_qsub(subject_id, parameters, timelimit);
 
     % Simulations for right amygdala
     parameters = load_parameters(config_right_transducer);
@@ -115,6 +136,10 @@ for subject_id = subject_list
     parameters.focus_pos_t1_grid = targets(:,target_id)';
     parameters.results_filename_affix = sprintf('_target_%s', target_names{target_id});
     parameters.interactive = 0;
-    single_subject_pipeline_with_qsub(subject_id, parameters, timelimit);
+    %single_subject_pipeline_with_qsub(subject_id, parameters, timelimit);
 
 end
+
+outputs_path = '/project/3023001.06/Simulations/data_for_prestus/';
+table_name = fullfile(outputs_path,'_localite_to_MNI_markers.csv');
+%writetable(localite_to_MNI_table,table_name)
