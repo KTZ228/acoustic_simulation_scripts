@@ -101,7 +101,7 @@ for subject_id = subject_list
     parameters.focus_pos_t1_grid = targets(:,target_id)';
     parameters.results_filename_affix = sprintf('_target_%s', target_names{target_id});
     parameters.interactive = 0;
-    single_subject_pipeline_with_qsub(subject_id, parameters, timelimit);
+    %single_subject_pipeline_with_qsub(subject_id, parameters, timelimit);
 
     % Simulations for right amygdala
     parameters = load_parameters(config_right_transducer);
@@ -116,6 +116,6 @@ for subject_id = subject_list
     parameters.focus_pos_t1_grid = targets(:,target_id)';
     parameters.results_filename_affix = sprintf('_target_%s', target_names{target_id});
     parameters.interactive = 0;
-    single_subject_pipeline_with_qsub(subject_id, parameters, timelimit);
+    %single_subject_pipeline_with_qsub(subject_id, parameters, timelimit);
 
 end
