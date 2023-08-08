@@ -28,7 +28,7 @@ files = struct2table(dir(parameters.data_path));
 subject_list_table = files(logical(contains(files.name, 'sub') .* ~contains(files.name, 'm2m')),:);
 subject_list = str2double((extract(subject_list_table{:,1}, digitsPattern))');
 
-subject_list = [1,3,4,5,8,9,10,14,17,18,19]; % Temporary, selects subjects with complete files
+%subject_list = [1,3,4,5,8,9,10,14,17,18,19]; % Temporary, selects subjects with complete files
 subject_list = [1];
 
 incorrectly_named_transducers = [1, 5, 14];
@@ -101,7 +101,7 @@ for subject_id = subject_list
     parameters.focus_pos_t1_grid = targets(:,target_id)';
     parameters.results_filename_affix = sprintf('_target_%s', target_names{target_id});
     parameters.interactive = 0;
-    single_subject_pipeline_with_qsub(subject_id, parameters, timelimit);
+    %single_subject_pipeline_with_qsub(subject_id, parameters, timelimit);
 
     % Simulations for right amygdala
     parameters = load_parameters(config_right_transducer);
@@ -116,6 +116,6 @@ for subject_id = subject_list
     parameters.focus_pos_t1_grid = targets(:,target_id)';
     parameters.results_filename_affix = sprintf('_target_%s', target_names{target_id});
     parameters.interactive = 0;
-    single_subject_pipeline_with_qsub(subject_id, parameters, timelimit);
+    %single_subject_pipeline_with_qsub(subject_id, parameters, timelimit);
 
 end

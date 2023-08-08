@@ -15,7 +15,7 @@ parameters.results_filename_affix = '_target_right_amygdala';
 %subject_list_table = files(logical(contains(files.name, 'sub') .* ~contains(files.name, 'm2m')),:);
 %subject_list = str2double((extract(subject_list_table{:,1}, digitsPattern))');
 subject_list = [1,3,4,5,8,9,10,14,17,18,19];
-%subject_list = 19;
+%subject_list = 1;
 
 % Load ROI
 maskname = 'juelich_prob_GM_Amygdala_laterobasal_groupL_thr75_bin.nii.gz';
