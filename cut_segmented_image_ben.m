@@ -1,5 +1,6 @@
 cd /home/mrphys/kenvdzee/Documents/PRESTUS/
 addpath('functions')
+addpath(genpath('toolboxes'))
 
 parameters = load_parameters('sjoerd_config_opt_CTX250-001_203_60.9mm.yaml');
 reference_to_transducer_distance = -(parameters.transducer.curv_radius_mm - parameters.transducer.dist_to_plane_mm);
@@ -43,22 +44,37 @@ for subject_i = 1:length(subject_list)
 
     % Determine grid size of transducer and size of entire grid
     grid_step_mm = parameters.grid_step_mm;
-    transducer_outer_radius = max(floor(parameters.transducer.Elements_OD_mm / grid_step_mm / 2) + 1);
+    transducer_outer_radius = max(floor(parameters.transducer.Elements_OD_mm / grid_step_mm / 2) + 1) / 2;
     grid_size = size(segmented_image_mni);
 
     % Determine coordinates around which a cylinder has to be made
     center_transducer = (transducer_position + transducer_axis_orientation_position) / 2;
     height_transducer = norm(transducer_axis_orientation_position - transducer_position);
+    cylinder_direction = (transducer_axis_orientation_position - transducer_position) / norm(transducer_axis_orientation_position - transducer_position);
 
-    % Create and fill the cylinder
-    [x, y, z] = ndgrid(1:grid_size(1), 1:grid_size(2), 1:grid_size(3));
-    cylinder_mask = (x - center_transducer(1)).^2 + (y - center_transducer(2)).^2 <= transducer_outer_radius^2 & ...
-        z >= center_transducer(3) - height_transducer/2 & z <= center_transducer(3) + height_transducer/2;
+    % Create line along transducer axis
+    transducer_axis = transducer_axis_orientation_position - transducer_position;
+    distances = linspace(0, 1, 100);
+    extrapolated_coordinates = zeros(100, 3);
+    for i = 1:100
+        extrapolated_coordinates(i, :) = transducer_position + distances(i) * transducer_axis;
+    end
+
+    cylinder_mask = zeros(grid_size);
+    % Create multiple circles along the axis
+    for coordinate_i = 1:size(extrapolated_coordinates, 1)
+        distances_circle_squared = (x - extrapolated_coordinates(coordinate_i,1)).^2 + (y - extrapolated_coordinates(coordinate_i,2)).^2 + (z - extrapolated_coordinates(coordinate_i,3)).^2;
+        ball_mask = distances_circle_squared <= transducer_outer_radius^2;
+        cylinder_mask = cylinder_mask | ball_mask;
+    end
+    
+    %cylinder_mask = imfill(cylinder_mask);
 
     % Replace values outside cylinder with 0
     segmented_image_mni(~cylinder_mask) = 0;
 
     % Save new segmented image with novel extension
+    % built to take two extensions into account
     [path, filename, extension_1] = fileparts(segmented_image_mni_file);
     [~, filename, extension_2] = fileparts(filename);
     cut_moniker = 'cutout';
