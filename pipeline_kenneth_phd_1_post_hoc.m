@@ -54,6 +54,7 @@ parameters_left = load_parameters(config_left_transducer);
 files = struct2table(dir(parameters_left.data_path));
 subject_list_table = files(logical(contains(files.name, 'sub') .* ~contains(files.name, 'm2m')),:);
 subject_list = str2double((extract(subject_list_table{:,1}, digitsPattern))');
+subject_list = 1;
 
 for subject_id = subject_list
     %% Load T1 image
@@ -188,6 +189,6 @@ for subject_id = subject_list
     parameters_right.results_filename_affix = sprintf('_target_%s', target_names{target_id});
 
     % Send job to qsub
-    single_subject_pipeline_with_qsub(subject_id, parameters_right, timelimit);
+    %single_subject_pipeline_with_qsub(subject_id, parameters_right, timelimit);
 
 end

@@ -14,12 +14,13 @@ parameters.results_filename_affix = '_target_left_amygdala';
 files = struct2table(dir(parameters.data_path));
 subject_list_table = files(logical(contains(files.name, 'sub') .* ~contains(files.name, 'm2m')),:);
 subject_list = str2double((extract(subject_list_table{:,1}, digitsPattern))');
-subject_list = [3,4,5];
 
 % Load ROI
 maskname = 'juelich_prob_GM_Amygdala_laterobasal_groupR_thr75_bin.nii.gz';
 mask_location = fullfile(masks_location, maskname);
 mask = niftiread(mask_location);
 
-create_group_MNI_plots(subject_list, parameters, 'ROI_MNI_mask', mask, 'outputs_suffix', '_max_intensity', 'plot_max_intensity', 1,...
-    'add_FWHM_boundary', 1, 'plot_heating', 0, 'brightness_correction', 1)
+create_group_MNI_plots(subject_list, parameters, 'ROI_MNI_mask', mask,...
+    'plot_max_intensity', 1, 'outputs_suffix', '_max_intensity',...
+    'add_FWHM_boundary', 1, 'brightness_correction', 1,...
+    'plot_heating', 0)

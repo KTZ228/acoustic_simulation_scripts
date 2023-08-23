@@ -60,15 +60,13 @@ for subject_i = 1:length(subject_list)
         extrapolated_coordinates(i, :) = transducer_position + distances(i) * transducer_axis;
     end
 
-    cylinder_mask = zeros(grid_size);
     % Create multiple circles along the axis
+    cylinder_mask = zeros(grid_size);
     for coordinate_i = 1:size(extrapolated_coordinates, 1)
         distances_circle_squared = (x - extrapolated_coordinates(coordinate_i,1)).^2 + (y - extrapolated_coordinates(coordinate_i,2)).^2 + (z - extrapolated_coordinates(coordinate_i,3)).^2;
         ball_mask = distances_circle_squared <= transducer_outer_radius^2;
         cylinder_mask = cylinder_mask | ball_mask;
     end
-    
-    %cylinder_mask = imfill(cylinder_mask);
 
     % Replace values outside cylinder with 0
     segmented_image_mni(~cylinder_mask) = 0;
