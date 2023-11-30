@@ -62,7 +62,7 @@ subject_id = 1; % subject id doesn't matter here as we use the brain of Ernie fr
 parameters.interactive = 0;
 parameters.overwrite_files = 'always';
 
-parameters.transducer.source_phase_deg = [0, 80, 150, 220];
+parameters.transducer.source_phase_deg = [0, 100, 150, 200];
 parameters.transducer.source_phase_rad = parameters.transducer.source_phase_deg/180*pi;
 
 single_subject_pipeline(subject_id, parameters);
@@ -85,7 +85,7 @@ colormap(getColorMap);
 xlabel('Lateral Position [mm]');
 ylabel('Axial Position [mm]');
 axis image;
-cb = colorbar;
+cb = colorbar;q
 title('Pressure for the focal plane')
 
 %% Part 5

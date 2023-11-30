@@ -1,9 +1,9 @@
 # Location of stored data
 data_path: /project/3023001.06/Simulations/kenneth_test/original_data/
 seg_path: /project/3023001.06/Simulations/kenneth_test/simulations/segmentation_data/
-simnibs_bin_path: /home/mrphys/kenvdzee/SimNIBS-4.0/bin/
+simnibs_bin_path: /home/affneu/kenvdzee/SimNIBS-4.0/bin/
 subject_subfolder: 1
-output_location: /project/3023001.06/Simulations/kenneth_test/simulations/posthoc/thalamus/
+output_location: /project/3023001.06/Simulations/kenneth_test/simulations/exploratory/dACC/
 
 overwrite_simnibs: 0
 
@@ -19,8 +19,11 @@ transducer:
   curv_radius_mm: 62.94 # radius of curvature of the bowl 
   dist_to_plane_mm: 52.38 # distance to the transducer plane from the geometric focus
   source_amp: 199270 # [Pa]
-  source_phase_deg: [0, 300.544203, 308.222241, 283.413768] # source phase [deg]
+  source_phase_deg: [0, 80, 150, 220] # source phase [deg]
+  pos_t1_grid: [85, 210, 235] #[85, 196, 235]
   source_freq_hz: 250e3 # [Hz] the central frequency
+
+focus_pos_t1_grid: [105, 177, 196] #[105, 182, 194]
 
 expected_focal_distance_mm: 60.9 # expected distance to the stimulation focus
 transducer_from_localite: 0 # should we load the transducer locations from the localite file(s) 
@@ -31,13 +34,13 @@ overwrite_simnibs: 0
 use_forceqform: 1
 
 run_posthoc_water_sims: 1
-run_heating_sims: 0
+run_heating_sims: 1
 
 thermal:
-  duty_cycle: 0.3 # [float between 0 and 1]
-  iti: 121 # [s]
-  n_trials: 1 # [integer]
-  stim_duration: 120 # [s]
+  duty_cycle: 0.15 # [float between 0 and 1]
+  iti: 0 # [s]
+  n_trials: 60 # [integer]
+  stim_duration: 0.3 # [s]
   continuous_protocol: 1 # [binary]
   # Pulse repetition frequency is not used since the cooling effects between these cycles are limited
 

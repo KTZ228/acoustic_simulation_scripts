@@ -1,9 +1,9 @@
 # Location of stored data
 data_path: /project/3023001.06/Simulations/kenneth_test/original_data/
 seg_path: /project/3023001.06/Simulations/kenneth_test/simulations/segmentation_data/
-simnibs_bin_path: /home/mrphys/kenvdzee/SimNIBS-4.0/bin/
+simnibs_bin_path: /home/affneu/kenvdzee/SimNIBS-4.0/bin/
 subject_subfolder: 1
-output_location: /project/3023001.06/Simulations/kenneth_test/simulations/exploratory/thalamus/
+output_location: /project/3023001.06/Simulations/kenneth_test/simulations/posthoc/thalamus/
 
 overwrite_simnibs: 0
 
@@ -19,7 +19,7 @@ transducer:
   curv_radius_mm: 62.94 # radius of curvature of the bowl 
   dist_to_plane_mm: 52.38 # distance to the transducer plane from the geometric focus
   source_amp: 199270 # [Pa]
-  source_phase_deg: [0, 300.544203, 308.222241, 283.413768] # source phase [deg]
+  source_phase_deg: [0, 290, 300, 310] # source phase [deg]
   source_freq_hz: 250e3 # [Hz] the central frequency
 
 expected_focal_distance_mm: 60.9 # expected distance to the stimulation focus

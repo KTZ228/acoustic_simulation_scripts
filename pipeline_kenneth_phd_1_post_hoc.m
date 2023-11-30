@@ -1,9 +1,9 @@
 %% These parameters can be changed
 % Delete if you have rights to add paths to Matlab
-cd /home/mrphys/kenvdzee/SimNIBS-4.0/
+cd /home/affneu/kenvdzee/SimNIBS-4.0/
 addpath(genpath('simnibs_env'))
 
-cd /home/mrphys/kenvdzee/Documents/PRESTUS/
+cd /home/affneu/kenvdzee/Documents/PRESTUS/
 addpath('functions')
 addpath('configs')
 addpath(genpath('toolboxes')) 
@@ -11,7 +11,7 @@ addpath('/home/common/matlab/fieldtrip/qsub')
 
 run_amygdala_sims = 1;
 run_250KHz = 1;
-run_layered_sims = 1;
+run_layered_sims = 0;
 
 % Load a lookup table for incorrectly named files
 incorrectly_named_files_table = readtable('/project/3023001.06/Simulations/kenneth_test/original_data/incorrectly_named_files.csv', 'Delimiter', ',');
@@ -163,7 +163,7 @@ for subject_id = subject_list
     parameters_left.results_filename_affix = sprintf('_target_%s', target_names{target_id});
 
     % Send job to qsub
-    single_subject_pipeline_with_qsub(subject_id, parameters_left, timelimit);
+    %single_subject_pipeline_with_qsub(subject_id, parameters_left, timelimit);
 
     %% Simulations for right target
     parameters_right = load_parameters(config_right_transducer);
@@ -189,6 +189,6 @@ for subject_id = subject_list
     parameters_right.results_filename_affix = sprintf('_target_%s', target_names{target_id});
 
     % Send job to qsub
-    %single_subject_pipeline_with_qsub(subject_id, parameters_right, timelimit);
+    single_subject_pipeline_with_qsub(subject_id, parameters_right, timelimit);
 
 end

@@ -1,7 +1,7 @@
 # Location of stored data
 data_path: /project/3023001.06/Simulations/kenneth_test/original_data/
 seg_path: /project/3023001.06/Simulations/kenneth_test/simulations/segmentation_data/
-simnibs_bin_path: /home/mrphys/kenvdzee/SimNIBS-4.0/bin/
+simnibs_bin_path: /home/affneu/kenvdzee/SimNIBS-4.0/bin/
 subject_subfolder: 1
 output_location: /project/3023001.06/Simulations/kenneth_test/simulations/posthoc/amygdala/
 

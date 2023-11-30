@@ -8,10 +8,10 @@ addpath('functions')
 addpath(genpath('toolboxes')) 
 addpath('/home/common/matlab/fieldtrip/qsub')
 
-run_amygdala_sims = 1;
+run_amygdala_sims = 0;
 run_250KHz = 1;
 run_layered_sims = 1;
-test_pipeline = 0;
+test_pipeline = 1;
 
 %% Add subject numbers for whom the localite files are flipped
 incorrectly_named_files_table = readtable('/project/3023001.06/Simulations/kenneth_test/original_data/incorrectly_named_files.csv', 'Delimiter', ',');
