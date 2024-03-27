@@ -8,8 +8,8 @@ addpath('functions')
 addpath(genpath('toolboxes')) 
 addpath('/home/common/matlab/fieldtrip/qsub')
 
-run_amygdala_sims = 1;
-run_layered_sims = 0;
+run_amygdala_sims = 0;
+run_layered_sims = 1;
 test_pipeline = 0;
 
 run_multiple_parameters = 0;
@@ -61,7 +61,7 @@ for Isppa_n = 1:length(Isppa_list)
             files = struct2table(dir(parameters_left.data_path));
             subject_list_table = files(logical(contains(files.name, 'sub') .* ~contains(files.name, 'm2m')),:);
             subject_list = str2double((extract(subject_list_table{:,1}, digitsPattern))');
-            %subject_list = 1;
+            subject_list = 1;
             
             for subject_id = subject_list
                 
@@ -120,7 +120,7 @@ for Isppa_n = 1:length(Isppa_list)
             
                 % Send job to qsub (if not in testing mode)
                 if test_pipeline == 0
-                    %single_subject_pipeline_with_qsub(subject_id, parameters_left, timelimit, memorylimit);
+                    single_subject_pipeline_with_qsub(subject_id, parameters_left, timelimit, memorylimit);
                 end
             
                 %% Simulations for right target
