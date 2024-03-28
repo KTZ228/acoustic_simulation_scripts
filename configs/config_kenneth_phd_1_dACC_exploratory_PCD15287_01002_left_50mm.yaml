@@ -20,10 +20,10 @@ transducer:
   dist_to_plane_mm: 67.5 # distance to the transducer plane from the geometric focus
   source_amp: 117192 # [Pa]
   source_phase_deg: [0, 360, 56, 83, 103, 126, 145, 139, 256, 142] # source phase [deg]
-  pos_t1_grid: [85, 210, 235] #[85, 196, 235]
+  pos_t1_grid: [51, 169, 255] #[85, 196, 235]
   source_freq_hz: 300e3 # [Hz] the central frequency
 
-focus_pos_t1_grid: [105, 177, 196] #[105, 182, 194]
+focus_pos_t1_grid: [104, 168, 204] #[105, 182, 194]
 
 expected_focal_distance_mm: 64.5 # expected distance to the stimulation focus
 transducer_from_localite: 0 # should we load the transducer locations from the localite file(s) 

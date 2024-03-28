@@ -8,7 +8,7 @@ addpath('functions')
 addpath(genpath('toolboxes')) 
 addpath('/home/common/matlab/fieldtrip/qsub')
 
-run_amygdala_sims = 0;
+run_amygdala_sims = 1;
 run_layered_sims = 1;
 test_pipeline = 0;
 
