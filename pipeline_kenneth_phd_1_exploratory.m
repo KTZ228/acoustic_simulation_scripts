@@ -3,12 +3,12 @@
 cd /home/affneu/kenvdzee/SimNIBS-4.0/
 addpath(genpath('simnibs_env'))
 
-cd /home/affneu/kenvdzee/Documents/PRESTUS/
+cd /home/affneu/kenvdzee/Documents/PRESTUS_donders_test/
 addpath('functions')
 addpath(genpath('toolboxes')) 
 addpath('/home/common/matlab/fieldtrip/qsub')
 
-run_amygdala_sims = 1;
+run_amygdala_sims = 0;
 run_layered_sims = 1;
 test_pipeline = 0;
 
@@ -61,7 +61,7 @@ for Isppa_n = 1:length(Isppa_list)
             files = struct2table(dir(parameters_left.data_path));
             subject_list_table = files(logical(contains(files.name, 'sub') .* ~contains(files.name, 'm2m')),:);
             subject_list = str2double((extract(subject_list_table{:,1}, digitsPattern))');
-            subject_list = 1;
+            subject_list = 8;
             
             for subject_id = subject_list
                 

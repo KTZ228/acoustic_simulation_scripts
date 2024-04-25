@@ -4,7 +4,7 @@ cd /home/affneu/kenvdzee/SimNIBS-4.0/
 addpath(genpath('simnibs_env'))
 
 % Add some functions to the path
-cd /home/affneu/kenvdzee/Documents/PRESTUS/
+cd /home/affneu/kenvdzee/Documents/PRESTUS_donders_test/
 addpath('functions')
 addpath(genpath('toolboxes')) 
 addpath('/home/common/matlab/fieldtrip/qsub')
