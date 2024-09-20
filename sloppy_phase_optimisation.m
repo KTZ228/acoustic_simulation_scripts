@@ -1,5 +1,5 @@
 %% Part 1
-clear
+clear, clc, close all
 cd /home/affneu/kenvdzee/Documents/PRESTUS/ % change path to demo data here
 
 % add paths
@@ -12,7 +12,7 @@ if gpuDeviceCount==0 && ~exist('/home/common/matlab/fieldtrip/qsub','dir')
 end
 
 %% Part 2
-real_profile = readmatrix('examples/Imasonic_test_ISPPA_65mm.csv');
+real_profile = readmatrix('/home/affneu/kenvdzee/Documents/focal_steering_tables/extracted_files/Imasonic_test_ISPPA_40%_R75_55mm.csv');
 desired_intensity = 36;
 
 [max_intensity, max_x] = max(real_profile(:,2));
@@ -21,7 +21,7 @@ real_profile_adjusted_for_intensity = real_profile;
 real_profile_adjusted_for_intensity(:,2) = real_profile_adjusted_for_intensity(:,2)./adjustment_factor_intensity;
 
 %% Part 3
-parameters = load_parameters('tutorial_config.yaml'); % load the configuration file
+parameters = load_parameters('phase_optimisation_config.yaml', '/home/affneu/kenvdzee/Documents/acoustic_simulation_scripts/configs/'); % load the configuration file
 
 parameters.simulation_medium = 'water'; % indicate that we only want the simulation in the water medium for now
 
@@ -36,11 +36,11 @@ subject_id = 1; % subject id doesn't matter here as we use the brain of Ernie fr
 parameters.interactive = 0;
 parameters.overwrite_files = 'always';
 
-single_subject_pipeline_with_qsub(subject_id, parameters);
+single_subject_pipeline_with_slurm(subject_id, parameters);
 
 %% Part 4
 % load results
-outputs_folder = sprintf('%s/sim_outputs/sub-%03d', parameters.data_path, subject_id);
+outputs_folder = sprintf('%s/sub-%03d', parameters.output_location, subject_id);
 
 load(sprintf('%s/sub-%03d_water_results%s.mat', outputs_folder, subject_id, parameters.results_filename_affix),'sensor_data','parameters');
 

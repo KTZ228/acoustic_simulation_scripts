@@ -15,25 +15,26 @@ run_layered_sims = 0;
 
 % Load a lookup table for incorrectly named files
 incorrectly_named_files_table = readtable('/project/3023001.06/Simulations/kenneth_test/original_data/incorrectly_named_files.csv', 'Delimiter', ',');
+config_location = '/home/affneu/kenvdzee/Documents/acoustic_simulation_scripts/configs/';
 
 % Set config files and export location
 if run_amygdala_sims == 1
     target_names = {'left_amygdala', 'right_amygdala'};
     if run_250KHz == 1
-        config_left_transducer = 'config_kenneth_phd_1_amygdala_posthoc_CTX250-001_203_60.9mm.yaml';
-        config_right_transducer = 'config_kenneth_phd_1_amygdala_posthoc_CTX250-026_105_61.5mm.yaml';
+        config_left_transducer = 'config_kenneth_phd_1_amygdala_posthoc_CTX250-001_203_64.5mm.yaml';
+        config_right_transducer = 'config_kenneth_phd_1_amygdala_posthoc_CTX250-026_105_64.5mm.yaml';
     else
-        config_left_transducer = 'config_kenneth_phd_1_amygdala_posthoc_CTX250-001_203_60.9mm.yaml';
-        config_right_transducer = 'config_kenneth_phd_1_amygdala_posthoc_CTX250-026_105_61.5mm.yaml';
+        config_left_transducer = 'config_kenneth_phd_1_amygdala_posthoc_CTX250-001_203_64.5mm.yaml';
+        config_right_transducer = 'config_kenneth_phd_1_amygdala_posthoc_CTX250-026_105_64.5mm.yaml';
     end
 else
     target_names = {'left_thalamus', 'right_thalamus'};
     if run_250KHz == 1
-        config_left_transducer = 'config_kenneth_phd_1_thalamus_posthoc_CTX250-001_203_60.9mm.yaml';
-        config_right_transducer = 'config_kenneth_phd_1_thalamus_posthoc_CTX250-026_105_61.5mm.yaml';
+        config_left_transducer = 'config_kenneth_phd_1_thalamus_posthoc_CTX250-001_203_64.5mm.yaml';
+        config_right_transducer = 'config_kenneth_phd_1_thalamus_posthoc_CTX250-026_105_64.5mm.yaml';
     else
-        config_left_transducer = 'config_kenneth_phd_1_thalamus_posthoc_CTX250-001_203_60.9mm.yaml';
-        config_right_transducer = 'config_kenneth_phd_1_thalamus_posthoc_CTX250-026_105_61.5mm.yaml';
+        config_left_transducer = 'config_kenneth_phd_1_thalamus_posthoc_CTX250-001_203_64.5mm.yaml';
+        config_right_transducer = 'config_kenneth_phd_1_thalamus_posthoc_CTX250-026_105_64.5mm.yaml';
     end
 end
 
@@ -48,13 +49,13 @@ end
 % Sets overwrite parameters and reference to transducer distance
 overwrite_option = 'always';
 interactive_option = 0;
-parameters_left = load_parameters(config_left_transducer);
+parameters_left = load_parameters(config_left_transducer, config_location);
 
 % Create a list containing all subjects with folders in 'raw_data'
 files = struct2table(dir(parameters_left.data_path));
 subject_list_table = files(logical(contains(files.name, 'sub') .* ~contains(files.name, 'm2m')),:);
 subject_list = str2double((extract(subject_list_table{:,1}, digitsPattern))');
-subject_list = 1;
+subject_list = 8;
 
 for subject_id = subject_list
     %% Load T1 image
@@ -69,7 +70,7 @@ for subject_id = subject_list
     t1_image = niftiread(fullfile(filename_t1.folder,filename_t1.name));
     
     %% Extract left transducer location from localite file
-    parameters_left = load_parameters(config_left_transducer);
+    parameters_left = load_parameters(config_left_transducer, config_location);
     reference_to_transducer_distance = -(parameters_left.transducer.curv_radius_mm - parameters_left.transducer.dist_to_plane_mm);
     extract_dt = @(x) datetime(x.name(end-20:end-4),'InputFormat','yyyyMMddHHmmssSSS');
     
@@ -101,7 +102,7 @@ for subject_id = subject_list
     left_focus_pos = ras_to_grid(left_focus_ras_pos, t1_header);
     
     %% Extract right transducer location from localite file
-    parameters_right = load_parameters(config_left_transducer);
+    parameters_right = load_parameters(config_left_transducer, config_location);
     reference_to_transducer_distance = -(parameters_right.transducer.curv_radius_mm - parameters_right.transducer.dist_to_plane_mm);
     
     % Load the trigger mark file
@@ -140,7 +141,7 @@ for subject_id = subject_list
     
     %% Simulations for the left target
     % Reload the parameters for the specific transducer
-    parameters_left = load_parameters(config_left_transducer);
+    parameters_left = load_parameters(config_left_transducer, config_location);
     parameters_left.overwrite_files = overwrite_option;
     parameters_left.interactive = interactive_option;
     
@@ -166,7 +167,7 @@ for subject_id = subject_list
     %single_subject_pipeline_with_qsub(subject_id, parameters_left, timelimit);
 
     %% Simulations for right target
-    parameters_right = load_parameters(config_right_transducer);
+    parameters_right = load_parameters(config_right_transducer, config_location);
     parameters_right.overwrite_files = overwrite_option;
     parameters_right.interactive = interactive_option;
     
@@ -189,6 +190,6 @@ for subject_id = subject_list
     parameters_right.results_filename_affix = sprintf('_target_%s', target_names{target_id});
 
     % Send job to qsub
-    single_subject_pipeline_with_qsub(subject_id, parameters_right, timelimit);
+    %single_subject_pipeline_with_qsub(subject_id, parameters_right, timelimit);
 
 end

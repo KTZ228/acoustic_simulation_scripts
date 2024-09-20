@@ -4,7 +4,7 @@ cd /home/affneu/kenvdzee/SimNIBS-4.0/
 addpath(genpath('simnibs_env'))
 
 % Add some functions to the path
-cd /home/affneu/kenvdzee/Documents/PRESTUS_donders_test/
+cd /home/affneu/kenvdzee/Documents/code_testing/PRESTUS/
 addpath('functions')
 addpath(genpath('toolboxes')) 
 addpath('/home/common/matlab/fieldtrip/qsub')
@@ -53,5 +53,5 @@ for i = 1:height(coordinate_list)
     parameters.results_filename_affix = sprintf('_positioning_preview_%s_%s_%s_%s', stim_target, stim_site, pos_t1_grid_string, focus_pos_t1_grid_string);
 
     %% Send jobs to qsub
-    single_subject_pipeline_with_qsub(subject_id, parameters);
+    single_subject_pipeline_with_slurm(subject_id, parameters);
 end
