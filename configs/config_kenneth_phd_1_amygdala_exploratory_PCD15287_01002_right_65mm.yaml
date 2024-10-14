@@ -3,7 +3,7 @@ data_path: /project/3023001.06/Simulations/kenneth_test/original_data/
 seg_path: /project/3023001.06/Simulations/kenneth_test/simulations/segmentation_data/
 simnibs_bin_path: /home/affneu/kenvdzee/SimNIBS-4.0/bin/
 subject_subfolder: 1
-output_location: /project/3023001.06/Simulations/kenneth_test/simulations/exploratory/amygdala/
+output_location: /project/3023001.06/Simulations/kenneth_test/simulations/exploratory/amygdala_65mm/
 
 overwrite_simnibs: 0
 
@@ -33,7 +33,7 @@ overwrite_simnibs: 0
 use_forceqform: 1
 
 run_posthoc_water_sims: 1
-run_heating_sims: 1
+run_heating_sims: 0
 
 thermal:
   duty_cycle: 0.15 # share of the stimulation duration during which the stimulation is on [0 to 1] (trial length = duty_cycle * stim_duration)

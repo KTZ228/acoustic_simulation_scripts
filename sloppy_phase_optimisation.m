@@ -168,7 +168,7 @@ opt_parameters.simulation_medium = 'water';
 opt_parameters.interactive = 0;
 opt_parameters.overwrite_files = 'always';
 % 
-single_subject_pipeline_with_qsub(subject_id, opt_parameters);
+single_subject_pipeline(subject_id, opt_parameters);
 
 %% Part 9
 opt_res = load(sprintf('%s/sub-%03d_water_results%s.mat', outputs_folder, subject_id, opt_parameters.results_filename_affix),'sensor_data','parameters');

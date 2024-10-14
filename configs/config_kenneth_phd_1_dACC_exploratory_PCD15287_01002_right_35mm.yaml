@@ -3,7 +3,7 @@ data_path: /project/3023001.06/Simulations/kenneth_test/original_data/
 seg_path: /project/3023001.06/Simulations/kenneth_test/simulations/segmentation_data/
 simnibs_bin_path: /home/affneu/kenvdzee/SimNIBS-4.0/bin/
 subject_subfolder: 1
-output_location: /project/3023001.06/Simulations/kenneth_test/simulations/exploratory/dACC_50mm/
+output_location: /project/3023001.06/Simulations/kenneth_test/simulations/exploratory/dACC_35mm/
 
 overwrite_simnibs: 0
 
@@ -18,12 +18,12 @@ transducer:
   Elements_OD_mm: [21.3, 29.1, 35.3, 40.7, 45.6, 50, 54.1, 58, 61.6, 65]
   curv_radius_mm: 75 # radius of curvature of the bowl 
   dist_to_plane_mm: 65.3 # distance to the transducer plane from the geometric focus
-  source_amp: 140000 # [Pa]
-  source_phase_deg: [0, 360, 79.69, 135.53, 223.77, 208.74, 268.28, 186.69, 309.73, 183.01] # source phase [deg]
-  pos_t1_grid: [84,182,262] #[84,182,250]
+  source_amp: 114000 # [Pa]
+  source_phase_deg: [0, 320.07, 62.07, 142.24, 250.94, 0.01, 27.98, 103.19, 32.22, 0.01] # source phase [deg]
+  pos_t1_grid: [136,182,262] #[136,182,250]
   source_freq_hz: 300e3 # [Hz] the central frequency
 
-focus_pos_t1_grid: [103,172,208]
+focus_pos_t1_grid: [123,172,211]
 
 transducer_from_localite: 0 # should we load the transducer locations from the localite file(s) 
 

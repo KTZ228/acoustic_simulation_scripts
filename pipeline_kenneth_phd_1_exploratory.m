@@ -12,22 +12,23 @@ addpath(genpath('toolboxes'))
 addpath('/home/common/matlab/fieldtrip/qsub')
 
 %% The following options can be altered
-run_amygdala_sims = 0;
+run_amygdala_sims = 1;
 run_layered_sims = 1;
 test_pipeline = 0;
 
 % Add an integer or list of the subjects you want to simulate
-subject_list = 14; %[8, 9, 10, 14];
+stimulation_depth = '65mm';
+subject_list = 8%[8, 9, 10, 14];
 
 % Set config files and export location
 if run_amygdala_sims == 1
-    config_left_transducer = 'config_kenneth_phd_1_amygdala_exploratory_PCD15287_01002_left_65mm.yaml';
-    config_right_transducer = 'config_kenneth_phd_1_amygdala_exploratory_PCD15287_01002_right_65mm.yaml';
+    config_left_transducer = sprintf('config_kenneth_phd_1_amygdala_exploratory_PCD15287_01002_left_%s.yaml', stimulation_depth);
+    config_right_transducer = sprintf('config_kenneth_phd_1_amygdala_exploratory_PCD15287_01002_right_%s.yaml', stimulation_depth);
     stimulation_target_left = 'left_amygdala';
     stimulation_target_right = 'right_amygdala';
 else
-    config_left_transducer = 'config_kenneth_phd_1_dACC_exploratory_PCD15287_01002_left_50mm.yaml';
-    config_right_transducer = 'config_kenneth_phd_1_dACC_exploratory_PCD15287_01002_right_50mm.yaml';
+    config_left_transducer = sprintf('config_kenneth_phd_1_dACC_exploratory_PCD15287_01002_left_%s.yaml', stimulation_depth);
+    config_right_transducer = sprintf('config_kenneth_phd_1_dACC_exploratory_PCD15287_01002_right_%s.yaml', stimulation_depth);
     stimulation_target_left = 'left_posterior_dacc';
     stimulation_target_right = 'right_posterior_dacc';
     %stimulation_target_left = 'left_medial_dacc';
@@ -87,14 +88,21 @@ for subject_id = subject_list
     focus = [parameters_left.focus_pos_t1_grid' parameters_right.focus_pos_t1_grid'];
 
     %% Preview transducer locations
+    % Makes a different slice depending on the target
+    if run_amygdala_sims == 1
+        slice_dim_right_figure = 3;
+    else
+        slice_dim_right_figure = 1;
+    end
+
     figure(1);
     imshowpair(plot_t1_with_transducer(t1_image, t1_header.PixelDimensions(1), transducers(:,1), focus(:,1), parameters_left), ...
-        plot_t1_with_transducer(t1_image, t1_header.PixelDimensions(1), transducers(:,1), focus(:,1), parameters_left, 'slice_dim', 1),'montage');
+        plot_t1_with_transducer(t1_image, t1_header.PixelDimensions(1), transducers(:,1), focus(:,1), parameters_left, 'slice_dim', slice_dim_right_figure),'montage');
     title('Left target')
 
     figure(2);
     imshowpair(plot_t1_with_transducer(t1_image, t1_header.PixelDimensions(1), transducers(:,2), focus(:,2), parameters_left), ...
-        plot_t1_with_transducer(t1_image, t1_header.PixelDimensions(1), transducers(:,2), focus(:,2), parameters_left, 'slice_dim', 1),'montage');
+        plot_t1_with_transducer(t1_image, t1_header.PixelDimensions(1), transducers(:,2), focus(:,2), parameters_left, 'slice_dim', slice_dim_right_figure),'montage');
     title('Right target');
     
     %% Simulations for the left target
